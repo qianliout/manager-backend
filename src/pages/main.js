@@ -5,6 +5,9 @@ import {Outlet} from "react-router-dom";
 import CommonSider from '../components/commonSider'
 import CommonHeader from '../components/commonHeader'
 
+import {useSelector} from 'react-redux'
+
+
 const {Header, Content} = Layout;
 const Main = () => {
   // const [collapsed, setCollapsed] = useState(false);
@@ -12,11 +15,13 @@ const Main = () => {
     token: {colorBgContainer, borderRadiusLG},
   } = theme.useToken();
 
+  const collapsed = useSelector(state => state.tab.isCollapse);
+
   return (
     <Layout className="main-container">
-      <CommonSider/>
+      <CommonSider collapsed={collapsed}/>
       <Layout>
-        <CommonHeader/>
+        <CommonHeader collapsed={collapsed}/>
         <Content
           style={{
             margin: '24px 16px',

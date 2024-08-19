@@ -2,12 +2,17 @@ import React from 'react';
 import {Button, Layout, Avatar, Dropdown} from 'antd';
 import {MenuFoldOutlined} from '@ant-design/icons'
 
+import {useDispatch, useSelector} from 'react-redux';
+
+import {collapseMenu} from '../../store/reducers/tab'
+
 import './index.css'
 
 const {Header} = Layout;
 
-const CommonHeader = () => {
+const CommonHeader = ({collapsed}) => {
   const logout = () => {
+
     console.log("logout")
   }
 
@@ -31,6 +36,13 @@ const CommonHeader = () => {
     },
   ];
 
+  const dispatch = useDispatch();
+  const setCollapsed = () => {
+    console.log(collapsed)
+    dispatch(collapseMenu())
+  }
+
+
   return (
     <Header className="header-container">
       <Button
@@ -41,6 +53,7 @@ const CommonHeader = () => {
           height: 32,
           backgroundColor: '#fff',
         }}
+        onClick={() => setCollapsed()}
       />
       <Dropdown
         menu={{items}}

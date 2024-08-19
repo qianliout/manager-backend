@@ -5,7 +5,6 @@ import * as Icon from '@ant-design/icons'
 import MenuConfig from "../../config"
 
 
-
 const {Sider} = Layout;
 
 
@@ -33,21 +32,27 @@ const items = MenuConfig.map((icon) => {
 )
 
 
-const CommonSider = () => {
-  return (<Sider>
-    <h3 className="app-name">通用后台管理系统</h3>
+const CommonSider = ({collapsed}) => {
+  console.log(collapsed)
+  return (
+    <Sider
+      collapsed={collapsed}
+    >
+      <h3 className="app-name">
+        {!collapsed ? "通用后台管理系统" : "后台"}
+      </h3>
 
-    <Menu
-      theme="dark"
-      mode="inline"
-      defaultSelectedKeys={['1']}
+      <Menu
+        theme="dark"
+        mode="inline"
+        defaultSelectedKeys={['1']}
 
-      items={items}
+        items={items}
 
-      style={{
-        height: '100%',
-      }}
-    />
-  </Sider>)
+        style={{
+          height: '100%',
+        }}
+      />
+    </Sider>)
 }
 export default CommonSider
