@@ -14,7 +14,7 @@ const Home = () => {
           <div className="user">
             <img src={userImg} alt=""/>
             <div className="userinfo">
-              <p className="name">Admin</p>
+              <p className="name">admin</p>
               <p className="acsses">超级管理员</p>
             </div>
           </div>
