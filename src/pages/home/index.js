@@ -4,6 +4,10 @@ import * as Icon from '@ant-design/icons'
 
 import './home.css'
 import {getData} from '../../api'
+import * as echarts from 'echarts';
+
+import MyEcharts from '../../components/Echarts'
+
 
 const columns = [
   {
@@ -68,17 +72,40 @@ const iconToElement = (name) => React.createElement(Icon[name])
 const Home = () => {
   const userImg = require('../../assets/images/user.png')
   // 页面加载完成之后调用
+  const [tableData, setTableData] = useState([])
+  const [chartData, setChartData] = useState({})
+
   useEffect(() => {
     getData().then(({data}) => {
-      console.log(data)
-
-      const {tableData} = data.data
-      console.log(tableData)
+      console.log("first data", data)
+      const {tableData, orderData} = data.data
       setTableData(tableData)
+      const order = orderData
+      const xData = order.date
+      console.log("order", order)
+      console.log("xData", order.date)
+      const keyArray = Object.keys(order.data[0])
+      console.log("keyArray", keyArray)
+      const series = []
+      keyArray.forEach(key => {
+        series.push({
+          name: key,
+          data: order.data.map(item => item[key]),
+          type: 'line',
+        })
+      })
+      console.log("series", series)
+
+      setChartData({
+        order: {
+          xData,
+          series
+        }
+      })
+
+      console.log("final chartData", chartData)
     })
   }, [])
-
-  const [tableData, setTableData] = useState([])
 
 
   return (
@@ -122,7 +149,10 @@ const Home = () => {
             })
           }
         </div>
-      </Col>
+
+        {chartData.order && <MyEcharts chartData={chartData.order} style={{height: '280px'}}/>}
+
+      < /Col>
     </Row>
   )
 }
