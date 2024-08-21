@@ -75,7 +75,6 @@ const Echarts = ({chartData, style, isAxisChart = true}) => {
 
 
   return (
-
     <div style={style} ref={echartRef}>
     </div>
   )

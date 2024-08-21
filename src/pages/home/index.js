@@ -143,7 +143,6 @@ const Home = () => {
                     <p className="num">${item.value}</p>
                     <p className="tex">{item.name} </p>
                   </div>
-
                 </Card>
               )
             })
