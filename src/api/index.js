@@ -29,3 +29,10 @@ export  const editUser = (data) => {
     data
   })
 }
+export  const deleteUser = (data) => {
+  return http.request({
+    url: "/user/deleteUser",
+    method: "post",
+    data
+  })
+}

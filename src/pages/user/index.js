@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react"
 import {Button, Form, Input, Table, Popconfirm, Modal, InputNumber, Select, DatePicker} from 'antd'
 
 import './user.css'
-import {getUser, addUser, editUser} from '../../api'
+import {getUser, addUser, editUser, deleteUser} from '../../api'
 import dayjs from 'dayjs'
 
 
@@ -27,16 +27,29 @@ const User = () => {
       form.setFieldsValue(cloneData)
     }
   }
-  const handleDelete = (rowData) => {
-
+  const handleDelete = ({id}) => {
+    deleteUser({id}).then(() => {
+      getTableData()
+    })
   }
   // 提交
   const handleFinish = (e) => {
-    setListData({name: e.name})
+    console.log("eeee", e)
+    setListData({name: e.keyword})
+    // 不能直接这样写，因为 setListData 是异步的，第一次拿到的还是老数据
+    // getTableData()
   }
+  // 监听listData,当 listData 改变时调用方法，更新列表
+  useEffect(() => {
+    console.log("搜索变动后执行了", listData)
+    getTableData()
+  }, [listData]);
+
+
+  // 获取用户数据
   const getTableData = () => {
-    getUser().then(({data}) => {
-      console.log("user res:", data.list)
+    getUser(listData).then(({data}) => {
+      console.log("搜索参数:", listData.name)
       setTableData(data.list)
     })
   }
@@ -44,9 +57,8 @@ const User = () => {
     form.validateFields().then((va) => {
         va.birth = dayjs(va.birth).format('YYYY-MM-DD')
         if (modalType) {
-
           // 编辑
-          editUser(va).then(()=>{
+          editUser(va).then(() => {
             handleCancel() // 关闭弹窗
             getTableData() // 更新列表数据（重新请求一下接口）
           })
@@ -122,13 +134,15 @@ const User = () => {
           <Form.Item name="keyword">
             <Input placeholder="请输入用户名"/>
           </Form.Item>
+
           <Form.Item>
             <Button htmlType="submit" type="primary">搜索</Button>
           </Form.Item>
+
         </Form>
       </div>
 
-      <Table columns={columns} dataSource={tableData} rowKey={"id"}/>
+      <Table style={{marginTop: '10px'}} columns={columns} dataSource={tableData} rowKey={"id"}/>
       {/* 编辑、新增用户的弹窗*/}
       <Modal
         open={modalOpen}
