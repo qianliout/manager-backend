@@ -4,7 +4,6 @@ import * as Icon from '@ant-design/icons'
 
 import './home.css'
 import {getData} from '../../api'
-import * as echarts from 'echarts';
 
 import MyEcharts from '../../components/Echarts'
 
@@ -78,7 +77,7 @@ const Home = () => {
   useEffect(() => {
     getData().then(({data}) => {
       console.log("first data", data)
-      const {tableData, orderData} = data.data
+      const {tableData, orderData, userData, videoData} = data.data
       setTableData(tableData)
       const order = orderData
       const xData = order.date
@@ -100,12 +99,34 @@ const Home = () => {
         order: {
           xData,
           series
+        },
+        user: {
+          xData: userData.map((item) => item.date),
+          series: [
+            {
+              name: "新增用户",
+              data: userData.map(item => item.new),
+              type: 'bar',
+            },
+            {
+              name: "活跃用户",
+              data: userData.map(item => item.active),
+              type: 'bar',
+            }
+          ]
+        },
+        video: {
+          series: [{
+            data: videoData,
+            type: 'pie'
+          }]
         }
+
       })
 
       console.log("final chartData", chartData)
     })
-  }, [])
+  }, [chartData])
 
 
   return (
@@ -150,7 +171,11 @@ const Home = () => {
         </div>
 
         {chartData.order && <MyEcharts chartData={chartData.order} style={{height: '280px'}}/>}
-
+        <div className="graph">
+          {chartData.user && <MyEcharts chartData={chartData.user} style={{height: '240px', width: '50%'}}/>}
+          {chartData.video &&
+            <MyEcharts chartData={chartData.video} style={{height: '260px', width: '50%'}} isAxisChart={false}/>}
+        </div>
       < /Col>
     </Row>
   )

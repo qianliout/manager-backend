@@ -72,3 +72,8 @@
 .home .num .detail {
     margin-left: 20px;
 }
+
+.home .graph {
+    display: flex;
+    margin-top: 20px;
+}
