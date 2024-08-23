@@ -1,24 +1,31 @@
 import React, {useEffect, useState} from "react"
-import {Button, Form, Input, Table, Popconfirm, Modal} from 'antd'
+import {Button, Form, Input, Table, Popconfirm, Modal, InputNumber, Select, DatePicker} from 'antd'
 
 import './user.css'
-import {getUser} from '../../api'
+import {getUser, addUser, editUser} from '../../api'
+import dayjs from 'dayjs'
+
 
 const User = () => {
   const [listData, setListData] = useState({name: ''})
   const [tableData, setTableData] = useState([]);
   const [modalType, setModalType] = useState(0);
   const [modalOpen, setModalOpen] = useState(false);
+  const [form] = Form.useForm()
+
   const handleClick = (type, rowData) => {
     console.log('handle click', type, rowData)
+    setModalOpen(!modalOpen)
     if (type === 'add') {
       setModalType(0)
+
     } else {
       setModalType(1)
+      const cloneData = JSON.parse(JSON.stringify(rowData)) // deep copy
+      cloneData.birth = dayjs(cloneData.birth)
+      // 表单数据的回填
+      form.setFieldsValue(cloneData)
     }
-    setModalOpen(!modalOpen)
-
-
   }
   const handleDelete = (rowData) => {
 
@@ -28,16 +35,33 @@ const User = () => {
     setListData({name: e.name})
   }
   const getTableData = () => {
-    getUser().then(res => {
-      console.log("user res:", res)
-      setTableData(res.data.list)
+    getUser().then(({data}) => {
+      console.log("user res:", data.list)
+      setTableData(data.list)
     })
   }
   const handleOk = () => {
+    form.validateFields().then((va) => {
+        va.birth = dayjs(va.birth).format('YYYY-MM-DD')
+        if (modalType) {
 
+          // 编辑
+          editUser(va).then(()=>{
+            handleCancel() // 关闭弹窗
+            getTableData() // 更新列表数据（重新请求一下接口）
+          })
+        } else {
+          addUser(va).then(() => {
+            handleCancel() // 关闭弹窗
+            getTableData() // 更新列表数据（重新请求一下接口）
+          })
+        }
+      }
+    )
   }
   const handleCancel = () => {
     setModalOpen(false);
+    form.resetFields() // 清空表单的数据
   }
   useEffect(() => {
     getTableData()
@@ -114,7 +138,107 @@ const User = () => {
         okText="确定"
         cancelText="取消"
       >
-        dfdfd
+        <Form
+          form={form}
+          labelCol={{span: 6}}
+          wrapperCol={{span: 18}}
+          labelAlign="left"
+        >
+          {
+            modalType == 1 && <Form.Item name="id" hidden>
+              <Input/>
+            </Form.Item>
+          }
+
+
+          <Form.Item
+            label="姓名"
+            name="name"
+            rules={
+              [
+                {
+                  required: true,
+                  message: "请输入姓名"
+                }
+              ]
+            }
+          >
+            <Input placeholder="请输入姓名"/>
+          </Form.Item>
+
+
+          <Form.Item
+            label="年龄"
+            name="age"
+            rules={
+              [
+                {
+                  required: true,
+                  message: "请输入年龄"
+                },
+                {
+                  type: Number,
+                  message: "年龄必须是数字"
+                }
+              ]
+            }
+          >
+            <InputNumber placeholder="请输入年龄"/>
+          </Form.Item>
+
+          <Form.Item
+            label="性别"
+            name="sex"
+            rules={
+              [
+                {
+                  required: true,
+                  message: "请输入性别"
+                },
+                {
+                  type: Number,
+                  message: "年龄必须是数字"
+                }
+              ]
+            }
+          >
+            <Select placeholder="请选择性别"
+                    options={[
+                      {value: 0, label: "男"},
+                      {value: 1, label: "女"}
+                    ]}
+            />
+          </Form.Item>
+          <Form.Item
+            label="出生日期"
+            name="birth"
+            rules={
+              [
+                {
+                  required: true,
+                  message: "请输入出生日期"
+                }
+              ]
+            }
+          >
+            <DatePicker placeholder="请选择出生日期" format="YYYY/MM/DD"/>
+          </Form.Item>
+
+          <Form.Item
+            label="地址"
+            name="addr"
+            rules={
+              [
+                {
+                  required: true,
+                  message: "请输入地址"
+                }
+              ]
+            }
+          >
+            <Input placeholder="请输入地址"/>
+          </Form.Item>
+        </Form>
       </Modal>
     </div>
   )
